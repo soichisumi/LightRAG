@@ -710,7 +710,7 @@ def create_app(args):
         ),
     )
 
-    # Initialize RAG with storage backends from args
+    # Initialize RAG
     if args.llm_binding in ["lollms", "ollama"]:
         rag = LightRAG(
             working_dir=args.working_dir,
