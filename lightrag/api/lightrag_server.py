@@ -408,7 +408,6 @@ def parse_args() -> argparse.Namespace:
         help="Path to SSL private key file (required if --ssl is enabled)",
     )
 
-    # Add storage backend arguments
     parser.add_argument(
         "--kv-storage",
         type=str,
