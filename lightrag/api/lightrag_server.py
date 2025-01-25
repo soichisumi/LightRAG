@@ -408,6 +408,26 @@ def parse_args() -> argparse.Namespace:
         help="Path to SSL private key file (required if --ssl is enabled)",
     )
 
+    # Add storage backend arguments
+    parser.add_argument(
+        "--kv-storage",
+        type=str,
+        default=get_env_value("KV_STORAGE", "JsonKVStorage"),
+        help="KV storage backend (default: from env or JsonKVStorage)",
+    )
+    parser.add_argument(
+        "--vector-storage", 
+        type=str,
+        default=get_env_value("VECTOR_STORAGE", "NanoVectorDBStorage"),
+        help="Vector storage backend (default: from env or NanoVectorDBStorage)",
+    )
+    parser.add_argument(
+        "--graph-storage",
+        type=str,
+        default=get_env_value("GRAPH_STORAGE", "NetworkXStorage"),
+        help="Graph storage backend (default: from env or NetworkXStorage)",
+    )
+
     args = parser.parse_args()
     display_splash_screen(args)
 
@@ -691,7 +711,7 @@ def create_app(args):
         ),
     )
 
-    # Initialize RAG
+    # Initialize RAG with storage backends from args
     if args.llm_binding in ["lollms", "ollama"]:
         rag = LightRAG(
             working_dir=args.working_dir,
@@ -708,6 +728,9 @@ def create_app(args):
                 "api_key": args.llm_binding_api_key,
             },
             embedding_func=embedding_func,
+            kv_storage=args.kv_storage,
+            vector_storage=args.vector_storage, 
+            graph_storage=args.graph_storage,
         )
     else:
         rag = LightRAG(
@@ -719,6 +742,9 @@ def create_app(args):
             llm_model_max_async=args.max_async,
             llm_model_max_token_size=args.max_tokens,
             embedding_func=embedding_func,
+            kv_storage=args.kv_storage,
+            vector_storage=args.vector_storage, 
+            graph_storage=args.graph_storage,
         )
 
     async def index_file(file_path: Union[str, Path]) -> None:
